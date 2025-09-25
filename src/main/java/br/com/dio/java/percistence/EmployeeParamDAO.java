@@ -4,6 +4,7 @@ import br.com.dio.java.percistence.entity.EmployeeEntity;
 import com.mysql.cj.jdbc.StatementImpl;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,25 +13,27 @@ import java.util.List;
 import static java.time.ZoneOffset.UTC;
 
 
-//import static jdk.internal.reflect.ConstantPool.Tag.UTF8;
 
-/// Crud  ---> Vunerable sqlInjection
-///
-public class EmployeeDAO {
-/*
+/// Crud
+public class EmployeeParamDAO {
+
     private String formateOffSetDateTime(final OffsetDateTime dateTime){
         return dateTime.format(DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm:ss"));
     }
 
     public void insert(final EmployeeEntity entity){
         try(var connection = ConnectionUtil.getConnection();
-            var statemente = connection.createStatement()
+            var statemente = connection.prepareStatement("INSERT INTO employees(name, salary, birthday) values (?, ?, ?);"
+
+            )
         ) {
-            var sql = "INSERT INTO employees(name, salary, birthday) values ('" +
-                     entity.getName() + "', " +
-                     entity.getSalary().toString() + "," +
-                    "'" +  formateOffSetDateTime(entity.getBirthday()) + "' )";
-            statemente.executeUpdate(sql);
+
+            statemente.setString(1, entity.getName());
+            statemente.setBigDecimal(2,entity.getSalary());
+            statemente.setTimestamp(3, Timestamp.valueOf(entity.getBirthday().atZoneSimilarLocal(UTC).toLocalDateTime()));
+
+            statemente.executeUpdate();
+
 
             System.out.printf(("Foram afetados %s na base de dados"), statemente.getUpdateCount());
 
@@ -46,16 +49,17 @@ public class EmployeeDAO {
 
     public void update(final EmployeeEntity entity){
         try(var connection = ConnectionUtil.getConnection();
-            var statemente = connection.createStatement()
+            var statemente = connection.prepareStatement("UPDATE employees set name = ?, slarry = ?, birthday = ?, WHERE id = ?")
         ) {
-            var sql = "UPDATE employees set " +
-                    " name = '" + entity.getName() +  "'," +
-                    " salary = " + entity.getSalary().toString() + "," +
-                    " birthday = '" +  formateOffSetDateTime(entity.getBirthday()) + "' "
-                    + "WHERE id = " + entity.getId();
-            statemente.executeUpdate(sql);
 
-            System.out.printf(("Foram afetados %s na base de dados"), statemente.getUpdateCount());
+
+            statemente.setString(1, entity.getName());
+            statemente.setBigDecimal(2,entity.getSalary());
+            statemente.setTimestamp(3, Timestamp.valueOf(entity.getBirthday().atZoneSimilarLocal(UTC).toLocalDateTime()));
+
+
+            statemente.executeUpdate();
+
 
             if (statemente instanceof StatementImpl impl){
                 entity.setId(impl.getLastInsertID());
@@ -70,12 +74,10 @@ public class EmployeeDAO {
 
     public void delete(final long id){
         try(var connection = ConnectionUtil.getConnection();
-            var statemente = connection.createStatement()
+            var statemente = connection.prepareStatement("DELETE FROM employees WHERE id = ?")
         ) {
-            var sql = "DELETE FROM employees WHERE id = " + id;
-            statemente.executeUpdate(sql);
-
-            //System.out.printf(("Foram afetados %s na base de dados"), statemente.getUpdateCount());
+            statemente.setLong(1, id);
+            statemente.executeUpdate();
 
 
         }catch (SQLException e){
@@ -119,11 +121,10 @@ public class EmployeeDAO {
         var  entity = new EmployeeEntity();
 
         try(var connection = ConnectionUtil.getConnection();
-            var statemente = connection.createStatement();
+            var statemente = connection.prepareStatement("SELECT * FROM employees WHERE id = ?");
         ) {
-
-            var sql = ("SELECT * FROM employees WHERE id =  " + id);
-            statemente.executeQuery(sql);
+            statemente.setLong(1, id);
+            statemente.executeQuery();
 
             var resultSet = statemente.getResultSet();
 
@@ -143,6 +144,4 @@ public class EmployeeDAO {
 
         return entity;
     }
-
- */
 }

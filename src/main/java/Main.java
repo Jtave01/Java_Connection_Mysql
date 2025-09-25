@@ -1,5 +1,6 @@
 import br.com.dio.java.percistence.ConnectionUtil;
 import br.com.dio.java.percistence.EmployeeDAO;
+import br.com.dio.java.percistence.EmployeeParamDAO;
 import br.com.dio.java.percistence.entity.EmployeeEntity;
 import org.flywaydb.core.Flyway;
 
@@ -12,10 +13,16 @@ import java.time.OffsetDateTime;
 import java.util.Properties;
 
 public class Main {
+    /* --> Vunerable from sqlIjection
     public static EmployeeDAO employeeDAO = new EmployeeDAO();
+
+     */
+    public static EmployeeParamDAO employeeDAO = new EmployeeParamDAO();
 
 
     public static void main(String[] args) throws IOException {
+
+
         Properties props = new Properties();
         /// Flyway recebe imput da application.properties
         try(InputStream input = Main.class.getClassLoader().getResourceAsStream("application.properties")) {
@@ -38,19 +45,8 @@ public class Main {
         }
 
         /// Delete
-        /*
-          employeeDAO.delete(4);
-         */
 
-        ///Update
-        /*
-        var employee = new EmployeeEntity();
-        employee.setId(3);
-        employee.setName("Gabriel");
-        employee.setSalary(new BigDecimal(7000));
-        employee.setBirthday(OffsetDateTime.now().minusYears(40));
-        employeeDAO.update(employee);*
-         */
+
 
         /// Escolhendo employees por id
         /*
@@ -62,14 +58,30 @@ public class Main {
         employeeDAO.findAll().forEach(System.out::println);
         */
 
-        /// Inseriondo employees
+        /// Inserindo employees
+
+        var insert = new EmployeeEntity();
+        insert.setName("Marco Aurelio");
+        insert.setSalary(new BigDecimal("50000"));
+        insert.setBirthday(OffsetDateTime.now().minusYears(40));
+        employeeDAO.insert(insert);
+
+
+        ///Update
         /*
-        var employee = new EmployeeEntity();
-        employee.setName("Pedro");
-        employee.setSalary(new BigDecimal("1000"));
-        employee.setBirthday(OffsetDateTime.now().minusYears(19));
-        employeeDAO.insert(employee);
+        var update = new EmployeeEntity();
+        update.setId(insert.getId());
+        update.setName("Gabriel");
+        update.setSalary(new BigDecimal(7000));
+        update.setBirthday(OffsetDateTime.now().minusYears(40));
+        employeeDAO.update(update);
         */
+
+        ///Delete
+        /*
+        employeeDAO.delete();
+        */
+
 
         /// Test connection
             /*
