@@ -9,16 +9,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Stream;
+import net.datafaker.Faker;
+
+import static java.time.ZoneOffset.UTC;
 
 public class Main {
     /* --> Vunerable from sqlIjection
-    public static EmployeeDAO employeeDAO = new EmployeeDAO();
-
+    private final static EmployeeDAO employeeDAO = new EmployeeDAO();
      */
-    public static EmployeeParamDAO employeeDAO = new EmployeeParamDAO();
 
+    private final static EmployeeParamDAO employeeDAO = new EmployeeParamDAO();
+    private final static Faker faker = new Faker();
 
     public static void main(String[] args) throws IOException {
 
@@ -44,8 +50,17 @@ public class Main {
             e.printStackTrace();
         }
 
-        /// Delete
 
+       ///Iserindo cadeira de usuarios
+       List<EmployeeEntity> entties =  Stream.generate(() ->
+                {var employee = new EmployeeEntity();
+                    employee.setName(faker.name().fullName());
+                    employee.setSalary(new BigDecimal(faker.number().digits(4)));
+                    employee.setBirthday(faker.date().birthdayLocalDate(20,20).atStartOfDay().atOffset(UTC));
+                    return employee;
+
+                }).limit(400).toList();
+        employeeDAO.insertBatch(entties);
 
 
         /// Escolhendo employees por id
@@ -60,12 +75,14 @@ public class Main {
 
         /// Inserindo employees
 
+
+        /*
         var insert = new EmployeeEntity();
         insert.setName("Marco Aurelio");
         insert.setSalary(new BigDecimal("50000"));
         insert.setBirthday(OffsetDateTime.now().minusYears(40));
         employeeDAO.insert(insert);
-
+         */
 
         ///Update
         /*

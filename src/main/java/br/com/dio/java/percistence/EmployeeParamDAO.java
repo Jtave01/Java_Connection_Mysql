@@ -144,4 +144,44 @@ public class EmployeeParamDAO {
 
         return entity;
     }
+
+
+    /// Criando operações em lotes
+
+    public void insertBatch(final List<EmployeeEntity> entities){
+
+        try(
+            var connection = ConnectionUtil.getConnection();
+            ){
+            var sql = "INSERT INTO employees(name, salary, birthday) values (?, ?, ?);";
+            try(var stateemente = connection.prepareStatement(sql)) {
+                connection.setAutoCommit(false);
+                for (int i = 0; i < entities.size(); i++) {
+
+
+
+                    stateemente.setString(1, entities.get(i).getName());
+                    stateemente.setBigDecimal(2, entities.get(i).getSalary());
+                    stateemente.setDate(3, java.sql.Date.valueOf(entities.get(i).getBirthday().toLocalDate()));
+
+                    stateemente.addBatch();
+
+                    if(i % 1000 == 0 || i == entities.size() -1 ){
+                        stateemente.executeBatch();
+                    }
+                }
+
+                connection.commit();
+
+            }catch (SQLException e){
+                connection.rollback();
+                e.printStackTrace();
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+
+    }
 }
