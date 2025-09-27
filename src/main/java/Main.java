@@ -1,6 +1,8 @@
 import br.com.dio.java.percistence.ConnectionUtil;
+import br.com.dio.java.percistence.ContactDao;
 import br.com.dio.java.percistence.EmployeeDAO;
 import br.com.dio.java.percistence.EmployeeParamDAO;
+import br.com.dio.java.percistence.entity.ContactEntity;
 import br.com.dio.java.percistence.entity.EmployeeEntity;
 import org.flywaydb.core.Flyway;
 
@@ -24,6 +26,7 @@ public class Main {
      */
 
     private final static EmployeeParamDAO employeeDAO = new EmployeeParamDAO();
+    private final static ContactDao contactDao = new ContactDao();
     private final static Faker faker = new Faker();
 
     public static void main(String[] args) throws IOException {
@@ -50,7 +53,32 @@ public class Main {
             e.printStackTrace();
         }
 
+        System.out.println(employeeDAO.findById(2258));
 
+
+
+        ///Inserindo contacts
+        /*var employee = new EmployeeEntity();
+        employee.setName("Joao");
+        employee.setSalary(new BigDecimal("750070"));
+        employee.setBirthday(OffsetDateTime.now().minusYears(50));
+        employeeDAO.insert(employee);
+        System.out.println(employee);
+
+        var contact1 = new ContactEntity();
+        contact1.setDescription("email");
+        contact1.setType("Luiz@gmail.com");
+        contact1.setEmployee(employee);
+        contactDao.insert(contact1);
+
+        var contact2 = new ContactEntity();
+        contact2.setDescription("email");
+        contact2.setType("35524569");
+        contact2.setEmployee(employee);
+        contactDao.insert(contact2);*/
+
+
+        /*
        ///Iserindo cadeira de usuarios
        List<EmployeeEntity> entties =  Stream.generate(() ->
                 {var employee = new EmployeeEntity();
@@ -62,6 +90,7 @@ public class Main {
                 }).limit(400).toList();
         employeeDAO.insertBatch(entties);
 
+       */
 
         /// Escolhendo employees por id
         /*
@@ -77,17 +106,19 @@ public class Main {
 
 
         /*
-        var insert = new EmployeeEntity();
-        insert.setName("Marco Aurelio");
-        insert.setSalary(new BigDecimal("50000"));
-        insert.setBirthday(OffsetDateTime.now().minusYears(40));
-        employeeDAO.insert(insert);
+        var employee = new EmployeeEntity();
+        employee.setName("Luiz");
+        employee.setSalary(new BigDecimal("750070"));
+        employee.setBirthday(OffsetDateTime.now().minusYears(50));
+        employeeDAO.employee(employee);
          */
+
+
 
         ///Update
         /*
         var update = new EmployeeEntity();
-        update.setId(insert.getId());
+        update.setId(employee.getId());
         update.setName("Gabriel");
         update.setSalary(new BigDecimal(7000));
         update.setBirthday(OffsetDateTime.now().minusYears(40));

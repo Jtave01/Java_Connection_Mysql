@@ -1,5 +1,6 @@
 package br.com.dio.java.percistence;
 
+import br.com.dio.java.percistence.entity.ContactEntity;
 import br.com.dio.java.percistence.entity.EmployeeEntity;
 import com.mysql.cj.jdbc.StatementImpl;
 
@@ -119,24 +120,48 @@ public class EmployeeParamDAO {
 
     public EmployeeEntity findById(final  long id){
         var  entity = new EmployeeEntity();
+        var sql = "SELECT e.id as employee_id,\n" +
+                "       e.name,\n" +
+                "       e.salary,\n" +
+                "       e.birthday,\n" +
+                "       c.id contact_id,\n" +
+                "       c.description,\n" +
+                "       c.type\n" +
+                "FROM employees e\n" +
+                "LEFT JOIN contacts c\n" +
+                "       ON c.employee_id = e.id " +
+                "WHERE e.id = ?";
 
         try(var connection = ConnectionUtil.getConnection();
-            var statemente = connection.prepareStatement("SELECT * FROM employees WHERE id = ?");
+            var statemente = connection.prepareStatement(sql);
         ) {
             statemente.setLong(1, id);
             statemente.executeQuery();
 
             var resultSet = statemente.getResultSet();
-
+            ///  1 colaborador para ----- [. . . .]
             if (resultSet.next()){
 
-                entity.setId(resultSet.getLong("id"));
+                entity.setId(resultSet.getLong("employee_id"));
                 entity.setName(resultSet.getString("name"));
                 entity.setSalary(resultSet.getBigDecimal("salary"));
                 var birthdayInstant = resultSet.getTimestamp("birthday").toInstant();
                 entity.setBirthday(OffsetDateTime.ofInstant(birthdayInstant,UTC));
+                entity.setContacts(new ArrayList<>());
+                ///  -----> varios contatos
+                do {
+                    var contatct = new ContactEntity();
+                    contatct.setId(resultSet.getLong("contact_id"));
+                    contatct.setDescription(resultSet.getString("description"));
+                    contatct.setType(resultSet.getString("type"));
+                    entity.getContacts().add(contatct);
+                }while(resultSet.next());
 
+                /*
+                entity.setContact(new ContactEntity());
+                   */
             }
+
 
         } catch (SQLException e) {
             e.printStackTrace();
